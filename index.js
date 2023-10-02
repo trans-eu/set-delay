@@ -2,6 +2,13 @@
 // Any greater value will be treated as 0 and invoke callback immediately.
 const maxTimeout = Math.pow(2, 31) - 1;
 
+/**
+ * Calls callback after specified timestamp.
+ * @param {() => any} callback function to be called on provided timestamp
+ * @param {number | Date} [timestamp] timestamp or Date object when function should be called
+ * @param {number} [maxInterval] maximum timeout check interval
+ * @returns {() => void} function canceling callback call
+ */
 function onDate(callback, timestamp = Date.now(), maxInterval = Infinity) {
     let timeoutId;
     const cleanup = [() => clearTimeout(timeoutId)];
@@ -10,7 +17,10 @@ function onDate(callback, timestamp = Date.now(), maxInterval = Infinity) {
         cleanup.length = 0;
     };
 
-    // Check if timestamp has passed. If it does not - schedule a timeout for next check.
+    /**
+     * Check if timestamp has passed. If it does not - schedule a timeout for next check.
+     * @param {boolean | Event} forceTimeout - should schedule timeout even when timeout is 0.
+     */
     const checkFn = (forceTimeout) => {
         clearTimeout(timeoutId);
         const diff = Math.max(/** @type {any} */(timestamp) - Date.now(), 0);
@@ -40,6 +50,13 @@ function onDate(callback, timestamp = Date.now(), maxInterval = Infinity) {
     return cancel;
 }
 
+/**
+ * setTimeout on steroids. Makes sure that function will be called after 'real world' timeout has passed.
+ * @param {() => any} callback function to be called after provided time
+ * @param {number} [timeout] after what time function should be called
+ * @param {number} [maxInterval] maximum timeout check interval
+ * @returns {() => void} function canceling callback call
+ */
 function setDelay(callback, timeout = 0, maxInterval = Infinity) {
     return onDate(callback, Date.now() + timeout, maxInterval);
 }
