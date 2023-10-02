@@ -1,3 +1,7 @@
+// setTimeout max accepted value for the interval parameter is max signed 32-bit integer.
+// Any greater value will be treated as 0 and invoke callback immediately.
+const maxTimeout = Math.pow(2, 31) - 1;
+
 function onDate(callback, timestamp = Date.now(), maxInterval = Infinity) {
     let timeoutId;
     const cleanup = [() => clearTimeout(timeoutId)];
@@ -18,7 +22,7 @@ function onDate(callback, timestamp = Date.now(), maxInterval = Infinity) {
                 reportError(error);
             }
         } else {
-            timeoutId = setTimeout(checkFn, Math.min(diff, maxInterval));
+            timeoutId = setTimeout(checkFn, Math.min(diff, maxInterval, maxTimeout));
         }
     };
 
